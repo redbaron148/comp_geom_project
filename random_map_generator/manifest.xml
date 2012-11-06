@@ -1,0 +1,18 @@
+<package>
+  <description brief="random_map_generator">
+
+     random_map_generator
+
+  </description>
+  <author>aaron</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/random_map_generator</url>
+  <depend package="roscpp"/>
+  <depend package="rospy"/>
+  <depend package="nav_msgs"/>
+  <depend package="geometry_msgs"/>
+
+</package>
+
+

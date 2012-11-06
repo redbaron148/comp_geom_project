@@ -43,8 +43,20 @@
 class RandomMapGenerator
 {
 public:
-    RandomMapGenerator() {}
-    ~RandomMapGenerator() {}
+    RandomMapGenerator()  {
+        n = ros::NodeHandle();
+    }
+    ~RandomMapGenerator() { ros::shutdown(); }
+
+private:
+    ros::NodeHandle n;
+
+    unsigned int max_num_obstacles;
+    unsigned int min_num_obstacles;
+    unsigned int largest_allowed_obstacle;
+    unsigned int smallest_allowed_obstacle;
+    unsigned int map_height;
+    unsigned int map_width;
 
 public:
     void seed(unsigned int seed){
@@ -61,7 +73,8 @@ public:
     
 };
 
-void main()
+int main(int argc, char **argv)
 {
+    ros::init(argc, argv, "random_map_generator");
     RandomMapGenerator();
 }

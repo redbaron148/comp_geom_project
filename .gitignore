@@ -1,2 +1,4 @@
 */build
 */bin
+*/*/*_gen
+*/*/lisp

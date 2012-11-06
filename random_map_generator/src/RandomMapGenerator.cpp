@@ -41,12 +41,14 @@
 //      OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-#define MAX_NUM_OBSTACLES_DEFAULT           30
-#define MIN_NUM_OBSTACLES_DEFAULT           0
-#define LARGEST_ALLOWED_OBSTACLE_DEFAULT    5
-#define SMALLEST_ALLOWED_OBSTACLE_DEFAULT   1
-#define MAP_HEIGHT_DEFAULT                  100
-#define MAP_WIDTH_DEFAULT                   100
+#define MAX_NUM_OBSTACLES_DEFAULT   30
+#define MIN_NUM_OBSTACLES_DEFAULT   0
+#define MAX_OBSTACLE_WIDTH_DEFAULT  20
+#define MIN_OBSTACLE_WIDTH_DEFAULT  1
+#define MAX_OBSTACLE_HEIGHT_DEFAULT 20 
+#define MIN_OBSTACLE_HEIGHT_DEFAULT 1
+#define MAP_HEIGHT_DEFAULT          100
+#define MAP_WIDTH_DEFAULT           100
 
 class RandomMapGenerator
 {
@@ -59,22 +61,28 @@ public:
             max_num_obstacles=MAX_NUM_OBSTACLES_DEFAULT;
         if(!n.getParam("min_num_obstacles", min_num_obstacles) || min_num_obstacles<0)
             min_num_obstacles=MIN_NUM_OBSTACLES_DEFAULT;
-        if(!n.getParam("largest_allowed_obstacle", largest_allowed_obstacle) || largest_allowed_obstacle<0)
-            largest_allowed_obstacle=LARGEST_ALLOWED_OBSTACLE_DEFAULT;
-        if(!n.getParam("smallest_allowed_obstacle", smallest_allowed_obstacle) || smallest_allowed_obstacle<0)
-            smallest_allowed_obstacle=SMALLEST_ALLOWED_OBSTACLE_DEFAULT;
+        if(!n.getParam("max_obstacle_width", max_obstacle_width) || max_obstacle_width<0)
+            max_obstacle_width=MAX_OBSTACLE_WIDTH_DEFAULT   ;
+        if(!n.getParam("min_obstacle_width", min_obstacle_width) || min_obstacle_width<0)
+            min_obstacle_width=MIN_OBSTACLE_WIDTH_DEFAULT;
+        if(!n.getParam("max_obstacle_height", max_obstacle_height) || max_obstacle_height<0)
+            max_obstacle_height=MAX_OBSTACLE_HEIGHT_DEFAULT;
+        if(!n.getParam("min_obstacle_height", min_obstacle_height) || min_obstacle_height<0)
+            min_obstacle_height=MIN_OBSTACLE_HEIGHT_DEFAULT;
         if(!n.getParam("map_height", map_height) || map_height<0)
             map_height=MAP_HEIGHT_DEFAULT;
         if(!n.getParam("map_width", map_width) || map_width<0)
             map_width=MAP_WIDTH_DEFAULT;
 
         
-        ROS_INFO("        max_num_obstacles: %d",max_num_obstacles);
-        ROS_INFO("        min_num_obstacles: %d",min_num_obstacles);
-        ROS_INFO(" largest_allowed_obstacle: %d",largest_allowed_obstacle);
-        ROS_INFO("smallest_allowed_obstacle: %d",smallest_allowed_obstacle);
-        ROS_INFO("               map_height: %d",map_height);
-        ROS_INFO("                map_width: %d",map_width);
+        ROS_INFO("  max_num_obstacles: %d",max_num_obstacles);
+        ROS_INFO("  min_num_obstacles: %d",min_num_obstacles);
+        ROS_INFO(" max_obstacle_width: %d",max_obstacle_width);
+        ROS_INFO(" min_obstacle_width: %d",min_obstacle_width);
+        ROS_INFO("max_obstacle_height: %d",max_obstacle_height);
+        ROS_INFO("min_obstacle_height: %d",min_obstacle_height);
+        ROS_INFO("         map_height: %d",map_height);
+        ROS_INFO("          map_width: %d",map_width);
     }
     ~RandomMapGenerator() { ros::shutdown(); }
 
@@ -85,13 +93,12 @@ private:
 
     int max_num_obstacles;
     int min_num_obstacles;
-    int largest_allowed_obstacle;
-    int smallest_allowed_obstacle;
+    int max_obstacle_width;
+    int min_obstacle_width;
+    int max_obstacle_height;
+    int min_obstacle_height;
     int map_height;
     int map_width;
-    
-    
-    //nav_msgs::GridCells* grid;
 
 public:
     void seed(unsigned int seed){
@@ -102,21 +109,44 @@ public:
         unsigned int num_obstacles = (rand()%(max_num_obstacles+1-min_num_obstacles)) + min_num_obstacles;
         ROS_INFO("Randomly adding %d obstacles", num_obstacles);
         
+        int x;
+        int y;
+        int width;
+        int height;
+        
         nav_msgs::GridCells grid;
-        grid.cell_width=0.5;
-        grid.cell_height=0.5;
+        
+        geometry_msgs::Point origin;
+        origin.x=0;
+        origin.y=0;
+        origin.z=0;
+        grid.cells.push_back(origin);
+        
+        grid.cell_width=1;
+        grid.cell_height=1;
         grid.header.stamp = ros::Time::now();
         grid.header.frame_id = "/global";
         
         for(unsigned int i=0;i<num_obstacles;i++)
         {
-            geometry_msgs::Point p;
+            //geometry_msgs::Point centroid;
+            width = (rand()%(max_obstacle_width+1-min_obstacle_width));
+            height = (rand()%(max_obstacle_height+1-min_obstacle_height));
             
-            p.x = rand()%(map_height+1);
-            p.y = rand()%(map_width+1);
-            p.z = 0;
+            x = rand()%(map_height+1);
+            y = rand()%(map_width+1);
             
-            grid.cells.push_back(p);
+            for(unsigned int h=0;h<height;h++){
+                for(unsigned int w=0;w<width;w++)
+                {
+                    geometry_msgs::Point p;
+                    p.x=x+w;
+                    p.y=y+h;
+                    p.z=0;
+                    
+                    grid.cells.push_back(p);
+                }
+            }
         }
         
         map_pub.publish(grid);

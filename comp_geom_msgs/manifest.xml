@@ -1,0 +1,16 @@
+<package>
+  <description brief="comp_geom_msgs">
+
+     comp_geom_msgs
+
+  </description>
+  <author>aaron</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/comp_geom_msgs</url>
+  <depend package="geometry_msgs"/>
+  <depend package="nav_msgs"/>
+
+</package>
+
+

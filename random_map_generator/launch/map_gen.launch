@@ -1,6 +1,4 @@
 <launch>
 	<node name="rmg" pkg="random_map_generator" type="random_map_generator" output="screen">
-		<param name="max_num_obstacles" value="20"/>
-		<param name="min_num_obstacles" value="20"/>
 	</node>
 </launch>

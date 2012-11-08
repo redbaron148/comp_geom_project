@@ -1,0 +1,8 @@
+uint32 max_num_obstacles
+uint32 min_num_obstacles
+uint32 max_obstacle_height
+uint32 min_obstacle_height
+uint32 max_obstacle_width
+uint32 min_obstacle_width
+uint32 map_height
+uint32 map_width

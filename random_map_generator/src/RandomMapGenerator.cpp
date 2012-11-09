@@ -61,9 +61,9 @@ public:
         init();
         fetch_params();
         
-        ROS_INFO("publish_rate: %d Hz",publish_rate);
-        ROS_INFO(" publish_map: %s",(publish_map==true?"true":"false"));
-        ROS_INFO("  always_new: %s",(start_default==true?"true":"false"));
+        ROS_INFO(" publish_rate: %d Hz",publish_rate);
+        ROS_INFO("  publish_map: %s",(publish_map==true?"true":"false"));
+        ROS_INFO("start_default: %s",(start_default==true?"true":"false"));
     }
     ~RandomMapGenerator() { ros::shutdown(); }
 
@@ -151,6 +151,7 @@ private:
         ROS_INFO("Generating a new map.\n\tmax_num_obstacles:\t%d\n\tmin_num_obstacles:\t%d\n\tmax_obstacle_height:\t%d\n\tmin_obstacle_height:\t%d\n\tmax_obstacle_width:\t%d\n\tmin_obstacle_width:\t%d\n\tmap_width:\t\t%d\n\tmap_height:\t\t%d",
 				max_num_obstacles, min_num_obstacles, max_obstacle_height, min_obstacle_height, max_obstacle_width, min_obstacle_width, map_width, map_height);
         
+        ROS_DEBUG("Inserting %d objects into the map.",num_obstacles);
         int x;
         int y;
         unsigned int width;
@@ -171,20 +172,26 @@ private:
         
         for(unsigned int i=0;i<num_obstacles;i++)
         {
-            width = (rand()%(max_obstacle_width+1-min_obstacle_width));
-            height = (rand()%(max_obstacle_height+1-min_obstacle_height));
+            width = (rand()%(max_obstacle_width+1-min_obstacle_width))+min_obstacle_width;
+            height = (rand()%(max_obstacle_height+1-min_obstacle_height))+min_obstacle_height;
+            
+            //ROS_DEBUG("Object %d's width/height: %d/%d",i,width,height);
             
             x = rand()%(map_height);
             y = rand()%(map_width);
+            
+            //ROS_DEBUG("Object %d's x/y: %d/%d", i,x,y);
             
             for(unsigned int h=0;h<height && (h+y)<map_height;h++){
                 for(unsigned int w=0;w<width && (w+x)<map_width;w++)
                 {
                     geometry_msgs::Point p;
-                    p.x=x+w;
-                    p.y=y+h;
+                    
+                    p.x=float(x+w);
+                    p.y=float(y+h);
                     p.z=0;
                     
+                    //ROS_DEBUG("Inserting sub-object at (%d,%d)",x+w,y+h);
                     _grid->cells.push_back(p);
                 }
             }
@@ -220,7 +227,7 @@ public:
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "random_map_generator");
+    ros::init(argc, argv, "rmg");
     RandomMapGenerator rmg;
     
     rmg.spin();
